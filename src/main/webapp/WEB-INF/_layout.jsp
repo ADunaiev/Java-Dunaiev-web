@@ -27,8 +27,7 @@
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li><a href="<%= context %>/cart"><i class="material-icons">shopping_cart</i></a></li>
                     <li><a href="<%= context %>/action"><i class="material-icons">local_atm</i></a></li>
-                    <li><a href="badges.html">Components</a></li>
-                    <li><a href="collapsible.html">JavaScript</a></li>
+                    <li><a href="<%=context%>/signup"><i class="material-icons">person_add</i></a></li>
                 </ul>
             </div>
         </nav>

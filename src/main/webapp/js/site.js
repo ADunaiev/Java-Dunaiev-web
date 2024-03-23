@@ -15,8 +15,68 @@ document.addEventListener('DOMContentLoaded', function() {
         signUpButton.onclick = signupButtonClick;
     }
 
+    // шукаємо кнопку додавання товару. якщо находим додаємо обробник
+    const addProductButton = document.getElementById("add-product-button");
+    if(addProductButton){
+        addProductButton.onclick = addProductButtonClick;
+    }
+
 });
 
+function addProductButtonClick(e) {
+    //console.log("product button clicked");
+
+    const addProductForm = e.target.closest('form');
+    if(! addProductForm) {
+        throw "Addproduct form was not found";
+    }
+
+    const productNameInput = addProductForm.querySelector('input[name="product-name"]');
+    if(!productNameInput) {throw "productNameInput not found";}
+    const productNameHelper = productNameInput.parentNode.querySelector('.helper-text');
+    if (!productNameHelper) throw "productNameInput '.helper-text' is not found";
+
+    const productPriceInput = addProductForm.querySelector('input[name="product-price"]');
+    if(!productPriceInput) {throw "productPriceInput not found";}
+    const productPriceHelper = productPriceInput.parentNode.querySelector('.helper-text');
+    if (!productPriceHelper) throw "productPriceInput '.helper-text' is not found";
+
+    const productDescriptionTextarea = addProductForm.querySelector('textarea[name="product-description"]');
+    if(!productDescriptionTextarea) {throw "productDescriptionTextarea not found";}
+
+    const productImgInput = addProductForm.querySelector('input[name="product-img"]');
+    if(!productImgInput) {throw "productImgInput not found";}
+
+    /// Валідація даних
+    if(
+        validateName(productNameInput, productNameHelper)
+    ){
+        // формуємо дані для передачі на бекенд
+        const formData = new FormData();
+        formData.append("product-name", productNameInput.value);
+        formData.append("product-price", productPriceInput.value);
+        formData.append("product-description", productDescriptionTextarea.value);
+        if (productImgInput.files.length >0){
+            formData.append("product-img", productImgInput.files[0]);
+        }
+
+        // передаємо - формуємо запит
+
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+            .then( r => r.json())
+            .then( j => {
+                console.log(j);
+
+                /* document.getElementById("sign-up-form").innerHTML =
+                     j['data']['message'];*/
+
+            }) ;
+    }
+
+}
 
 function signupButtonClick(e) {
     // console.log("signup button clicked");

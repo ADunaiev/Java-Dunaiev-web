@@ -7,6 +7,8 @@ import step.learning.services.form.FormParseService;
 import step.learning.services.form.HybridFormParser;
 import step.learning.services.hash.HashService;
 import step.learning.services.hash.Md5HashService;
+import step.learning.services.kdf.HashKdfService;
+import step.learning.services.kdf.KdfService;
 
 public class ServiceModule extends AbstractModule {
     @Override
@@ -16,6 +18,8 @@ public class ServiceModule extends AbstractModule {
         bind(HashService.class).to(Md5HashService.class);  // ASP: Service.AddSingleton<Hash,Md5>
         bind(DbService.class).to(MySqlDbService.class);
         bind(FormParseService.class).to(HybridFormParser.class);
+        bind(KdfService.class).to(HashKdfService.class);
+
     }
 }
 /*

@@ -1,9 +1,12 @@
 package step.learning.services.hash;
 
+import com.google.inject.Singleton;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+@Singleton
 public class Md5HashService implements HashService {
     @Override
     public String digest(String input) {

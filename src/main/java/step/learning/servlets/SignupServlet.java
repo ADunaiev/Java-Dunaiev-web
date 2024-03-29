@@ -70,6 +70,7 @@ public class SignupServlet extends HttpServlet {
         }
 
         String userPassword = fields.get("user-password");
+
         if(userPassword == null || userPassword.isEmpty()) {
             sendRest(resp, "error", "Property 'user-password' required", null);
             return;

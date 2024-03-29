@@ -52,3 +52,8 @@
         </div>
     </div>
 </form>
+
+<p class="flow-text" id="sign-up-result">
+
+</p>
+

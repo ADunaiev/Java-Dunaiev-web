@@ -68,6 +68,7 @@ function addProductButtonClick(e) {
         })
             .then( r => r.json())
             .then( j => {
+
                 console.log(j);
 
                 /* document.getElementById("sign-up-form").innerHTML =
@@ -110,6 +111,9 @@ function signupButtonClick(e) {
     const avatarInput = signupForm.querySelector('input[name="user-avatar"]');
     if(!avatarInput) {throw "avatarInput not found";}
 
+    const signupResult = document.getElementById('sign-up-result');
+    if(!signupResult) {throw "Element 'sign-up-result' not found";}
+
     /// Валідація даних
     if(
         validateName(nameInput, nameHelper) &&
@@ -134,9 +138,25 @@ function signupButtonClick(e) {
         })
             .then( r => r.json())
             .then( j => {
-                console.log(j);
 
-               /* document.getElementById("sign-up-form").innerHTML =
+                if(j.meta.status == "success") {
+
+                    signupResult.innerHTML = j.meta.message;
+                    signupResult.style.background = "lightgreen";
+
+                    setTimeout(function () {
+                        window.location.href = '/' + (window.location.pathname.split('/')[1]) + '/';
+                    }, 3000);
+                }
+                else {
+                    signupResult.innerHTML = j.meta.message;
+                    signupResult.style.background = "lightpink";
+
+                    passwordInput.value = "";
+                    repeatInput.value = "";
+                }
+
+               /*document.getElementById("sign-up-form").innerHTML =
                     j['data']['message'];*/
 
             }) ;

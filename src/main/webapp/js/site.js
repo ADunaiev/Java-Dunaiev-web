@@ -11,16 +11,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // шукаємо кнопку реєстрації. якщо находим додаємо обробник
     const signUpButton = document.getElementById("signup-button");
-    if(signUpButton){
-        signUpButton.onclick = signupButtonClick;
-    }
+    if(signUpButton){signUpButton.onclick = signupButtonClick;}
+
+    // шукаємо кнопку реєстрації. якщо находим додаємо обробник
+    const authButton = document.getElementById("auth-button");
+    if(authButton){authButton.onclick = authButtonClick;}
 
     // шукаємо кнопку додавання товару. якщо находим додаємо обробник
     const addProductButton = document.getElementById("add-product-button");
     if(addProductButton){
         addProductButton.onclick = addProductButtonClick;
     }
-
+    checkAuth();
 });
 
 function addProductButtonClick(e) {
@@ -164,6 +166,75 @@ function signupButtonClick(e) {
 
 }
 
+function authButtonClick(e) {
+    // console.log("signup button clicked");
+    // шукаємо батьківський елемент кнопки (e.target)
+
+    const authForm = e.target.closest('form');
+    if(! authForm) {
+        throw "Auth form was not found";
+    }
+
+    const emailInput = authForm.querySelector('input[name="sign-in-email"]');
+    if(!emailInput) {throw "sign-in-email not found";}
+    const emailHelper = emailInput.parentNode.querySelector('.helper-text');
+    if (!emailHelper) throw "emailInput '.helper-text' is not found";
+
+    const passwordInput = authForm.querySelector('input[name="sign-in-password"]');
+    if(!passwordInput) {throw "sign-in-password not found";}
+    const passwordHelper = passwordInput.parentNode.querySelector('.helper-text');
+    if (!passwordHelper) throw "passwordInput '.helper-text' is not found";
+
+
+
+    /// Валідація даних
+
+    if(
+        validateEmail(emailInput, emailHelper) &&
+        validatePassword(passwordInput, passwordHelper)
+    ){
+
+        // передаємо - формуємо запит
+
+        fetch(`/${getContext()}/auth?email=${emailInput.value}&password=${passwordInput.value}`, {
+            method: 'GET'
+        })
+            .then( r => r.json())
+            .then(j => {
+                if( j.data == null || typeof j.data.token == "undefined") {
+                    document.getElementById("modal-auth-message").innerText = "Authorization rejected!";
+                }
+                else {
+                    // авторізація токенами передбачає їх збереження з метою
+                    // подальшого використання. Для того, щоб токени були доступні після перезавантаження
+                    // їх вміщують до постійного сховища браузера - localStorage
+                    localStorage.setItem("auth-token", j.data.token);
+                    window.location.reload();
+                }
+            });
+
+
+    }
+
+}
+
+function getContext() {
+    return window.location.pathname.split('/')[1];
+}
+function checkAuth() {
+    // ... при завантаженні сторінки перевіряємо наявність даних автентифікації
+    // у localStorage
+
+    const authToken = localStorage.getItem("auth-token");
+    if(authToken) {
+        // перевіряємо токен на валіндність і одержуємо дані користувача
+        fetch(`/${getContext()}/auth?token=${authToken}`, {
+            method: 'POST'
+        })
+            .then( r => r.json())
+            .then(console.log);
+    }
+}
 
 function validateName (nameInput, nameInputHelper) {
     var check = true;

@@ -16,6 +16,7 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link rel="stylesheet" href="<%=context%>/css/site.css">
+    <link rel="icon" href="<%=context%>/img/java.png">
 <head>
     <title>My Java Site</title>
 </head>
@@ -28,7 +29,7 @@
                     <li><a href="<%= context %>/cart"><i class="material-icons">shopping_cart</i></a></li>
                     <li><a href="<%= context %>/product"><i class="material-icons">add</i></a></li>
                     <li><a href="<%= context %>/action"><i class="material-icons">local_atm</i></a></li>
-                    <li><a href="<%=context%>/signup"><i class="material-icons">person_add</i></a></li>
+                    <li><a href="#auth-modal" class="modal-trigger"><i class="material-icons">key</i></a></li>
                 </ul>
             </div>
         </nav>
@@ -62,6 +63,45 @@
             </div>
         </div>
     </footer>
+
+
+
+    <!-- Modal Structure -->
+    <div id="auth-modal" class="modal">
+        <form class="modal-content" id="auth-modal-form">
+            <h5>Authorization</h5>
+            <div class="row">
+                <div class="col s12">
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix amber-text text-lighten-1">email</i>
+                            <input id="sign-in-email" name="sign-in-email" type="email" class="validate">
+                            <label for="sign-in-email">Email</label>
+                            <span class="helper-text" data-error="wrong" data-success="right">Ваш email</span>
+                        </div>
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix amber-text text-lighten-1">password</i>
+                            <input id="sign-in-password" name="sign-in-password" type="password" class="validate">
+                            <label for="sign-in-password">Password</label>
+                            <span class="helper-text" data-error="wrong" data-success="right">Пароль</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span id="modal-auth-message"></span>
+            <div class="row center-align">
+                <div class="col s12">
+                    <!--<a href="#!" style="width:100%;" class="modal-close waves-effect blue btn">Sign in</a> -->
+                    <button style="width:100%;" class="waves-effect amber lighten-1 btn" type="button" id="auth-button">Sign in</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <a href="<%=context%>/signup" style="width:100%;" class="modal-close waves-effect waves-green btn">Sign Up</a>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>

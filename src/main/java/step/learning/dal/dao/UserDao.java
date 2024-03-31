@@ -5,12 +5,14 @@ import com.google.inject.Singleton;
 import step.learning.dal.dto.User;
 import step.learning.services.db.DbService;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.UUID;
 
 @Singleton
 public class UserDao {
     private  final DbService dbService;
+    static final int TOKEN_LIFETIME = 1000 * 60 * 15; // 15 хвилин
 
     @Inject
     public UserDao(DbService dbService) {
@@ -23,7 +25,7 @@ public class UserDao {
             String token = UUID.randomUUID().toString();
             prep.setString(1, token);
             prep.setString(2, user.getId().toString());
-            prep.setTimestamp(3, new Timestamp(new java.util.Date().getTime() + 60 * 15 * 1000 ) );
+            prep.setTimestamp(3, new Timestamp(new java.util.Date().getTime() + TOKEN_LIFETIME ) );
             prep.executeUpdate();
             return token;
         }
@@ -69,6 +71,25 @@ public class UserDao {
         }
         return null;
     }
+
+    public void prolongToken(String token) {
+
+        String sql =    "UPDATE Tokens " +
+                        "SET token_expires = ? " +
+                        " WHERE token_id = ?";
+
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql) ) {
+            Timestamp timestamp = getTokenExpiresByTokenId(token);
+
+            prep.setTimestamp(1, new Timestamp(timestamp.getTime() + TOKEN_LIFETIME / 2) );
+            prep.setString(2, token);
+            prep.executeUpdate();
+        }
+        catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            System.out.println(sql);
+        }
+    }
     public User getUserByToken(String token) {
         String sql =    "SELECT * " +
                         "FROM Tokens t JOIN Users u ON t.user_id = u.user_id " +
@@ -78,6 +99,7 @@ public class UserDao {
             prep.setString(1, token);
             ResultSet res = prep.executeQuery();
             if (res.next()) {
+
                 return User.fromResultSet(res);
             }
             else {
@@ -88,6 +110,45 @@ public class UserDao {
             System.err.println(e.getMessage());
             System.out.println(sql);
 
+        }
+        return null;
+    }
+
+    public String getTokenByUser (User user) {
+        String sql =    "SELECT *\n" +
+                "FROM Tokens t\n" +
+                "WHERE t.user_id = ? AND CURRENT_TIMESTAMP < t.token_expires\n" +
+                "ORDER BY t.token_expires DESC\n" +
+                "LIMIT 1";
+        try (PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+            prep.setString(1, user.getId().toString());
+            ResultSet res = prep.executeQuery();
+
+            if(res.next()) {
+                return res.getString("token_id");
+            }
+        }
+        catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            System.out.println(sql);
+        }
+        return null;
+    }
+
+    public Timestamp getTokenExpiresByTokenId(String token_id) {
+        String sql = "SELECT * FROM Tokens t WHERE t.token_id = ?";
+
+        try(PreparedStatement prep = dbService.getConnection().prepareStatement(sql)) {
+            prep.setString(1, token_id);
+            ResultSet res = prep.executeQuery();
+
+            if(res.next()) {
+                return res.getTimestamp("token_expires");
+            }
+        }
+        catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            System.out.println(sql);
         }
         return null;
     }

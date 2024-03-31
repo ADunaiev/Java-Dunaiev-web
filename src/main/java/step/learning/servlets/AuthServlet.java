@@ -42,6 +42,7 @@ public class AuthServlet extends HttpServlet {
 
         }
         else {
+            userDao.prolongToken(token);
             JsonObject rest = new JsonObject();
             JsonObject meta = new JsonObject();
             meta.addProperty("service", "auth");
@@ -92,8 +93,15 @@ public class AuthServlet extends HttpServlet {
             sendRest(resp, "error", "Credentials rejected", null);
             return;
         }
-        // генеруємо токен доступу користувача
-        String token = userDao.generateToken(user);
+
+        // перевіряємо наявність діючего токена
+        String token = userDao.getTokenByUser(user);
+
+        if (token == null) {
+            // генеруємо токен доступу користувача
+            token = userDao.generateToken(user);
+        }
+
         sendRest(resp, "success", "Credentials confirmed", token);
 
     }

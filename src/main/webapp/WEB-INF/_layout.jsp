@@ -27,9 +27,10 @@
                 <a href="<%=context%>/" class="brand-logo">My First Java web</a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
                     <li><a href="<%= context %>/cart"><i class="material-icons">shopping_cart</i></a></li>
+                    <li><a href="<%= context %>/shop"><i class="material-icons">shop</i></a></li>
                     <li><a href="<%= context %>/product"><i class="material-icons">add</i></a></li>
                     <li><a href="<%= context %>/action"><i class="material-icons">local_atm</i></a></li>
-                    <li><a href="#auth-modal" class="modal-trigger"><i class="material-icons">key</i></a></li>
+                    <li data-auth="avatar"><a href="#auth-modal" class="modal-trigger"><i class="material-icons">key</i></a></li>
                 </ul>
             </div>
         </nav>

@@ -8,18 +8,19 @@
                 <div class="input-field col s12 m6">
                     <input id="product-name" name="product-name" type="text" class="validate">
                     <label for="product-name">Назва товару</label>
-                    <span class="helper-text" data-error="wrong" data-success="right">Використовувайте лише літери</span>
+                    <span id="product-name-helper" class="helper-text" data-error="wrong" data-success="right">Використовувайте лише літери</span>
                 </div>
 
                 <div class="input-field col s12 m6">
                     <input id="product-price" name="product-price" type="number" class="validate">
                     <label for="product-price">Ціна товару</label>
-                    <span class="helper-text" data-error="wrong" data-success="right">Використовувайте лише цифри</span>
+                    <span id="product-price-helper" class="helper-text" data-error="wrong" data-success="right">Використовувайте лише цифри</span>
                 </div>
 
                 <div class="input-field col s12 m12">
-                    <textarea id="product-description" name="product-description" class="materialize-textarea"></textarea>
+                    <textarea id="product-description" name="product-description" class="materialize-textarea validate"></textarea>
                     <label for="product-description">Опис товару</label>
+                    <span id="description-helper" class="helper-text">Опис товару</span>
                 </div>
 
                 <div class="file-field input-field col s12 m6">

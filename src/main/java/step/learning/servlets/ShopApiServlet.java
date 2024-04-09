@@ -7,6 +7,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.commons.fileupload.FileItem;
 import step.learning.dal.dao.ProductDao;
+import step.learning.dal.dao.UserDao;
 import step.learning.dal.dto.Product;
 import step.learning.dal.dto.User;
 import step.learning.services.form.FormParseResult;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,11 +29,13 @@ public class ShopApiServlet extends HttpServlet {
 
     private final FormParseService formParseService;
     private final ProductDao productDao;
+    private final UserDao userDao;
 
     @Inject
-    public ShopApiServlet(FormParseService formParseService, ProductDao productDao) {
+    public ShopApiServlet(FormParseService formParseService, ProductDao productDao, UserDao userDao) {
         this.formParseService = formParseService;
         this.productDao = productDao;
+        this.userDao = userDao;
     }
 
     @Override
@@ -42,6 +46,18 @@ public class ShopApiServlet extends HttpServlet {
         Map<String, FileItem> files = parseResult.getFiles();
 
         // Перевірити токен та його валідність
+        String token_id = fields.get("token");
+
+        if(token_id == null || token_id.isEmpty()) {
+            resp.setStatus(401);
+            sendRest(resp,"error", "Token is empty", null);
+            return;
+        }
+        else if (userDao.getUserByToken(token_id) == null) {
+            resp.setStatus(403);
+            sendRest(resp, "error", "Token is not valid", null);
+            return;
+        }
 
         // Перевірити поля з даними
         String name = fields.get("name");
@@ -55,6 +71,10 @@ public class ShopApiServlet extends HttpServlet {
             sendRest(resp, "error", "Property 'price' required", null);
             return;
         }
+        else if (Double.parseDouble(price) <= 0) {
+            sendRest(resp, "error", "Property 'price' should be positive", null);
+            return;
+        }
 
         String description = fields.get("description");
 
@@ -62,6 +82,11 @@ public class ShopApiServlet extends HttpServlet {
             sendRest(resp, "error", "Property 'description' required", null);
             return;
         }
+        else if (description.length() <= 50) {
+            sendRest(resp, "error", "Property 'description' should be more than 50 characters", null);
+            return;
+        }
+
         FileItem image = files.get("image");
 
         //реєструємо користувача у БД
@@ -83,6 +108,13 @@ public class ShopApiServlet extends HttpServlet {
                 return;
             }
             String ext = image.getName().substring(dotPosition);
+
+            // перевірка допустимого типу файла
+            String[] allowedExtensions = new String[] {".png", ".jpg", ".jpeg", ".bmp"};
+            if (!Arrays.asList(allowedExtensions).contains(ext)) {
+                sendRest(resp, "error", "This file extension is not allowed!", null);
+                return;
+            }
 
             String savedName;
             File savedFile;

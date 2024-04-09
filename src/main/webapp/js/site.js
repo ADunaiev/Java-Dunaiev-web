@@ -255,29 +255,54 @@ function checkAuth() {
 function addProductClick(e) {
     const form = e.target.closest('form');
 
-    const name = form.querySelector("#product-name").value.trim();
+    const nameInput = form.querySelector("#product-name");
+    const nameInputHelper = form.querySelector("#product-name-helper");
+
+
     const fileInput = form.querySelector("#product-img");
-    const price = Number(form.querySelector("#product-price").value.trim());
-    const description = form.querySelector("#product-description").value.trim();
+
+    const priceInput = form.querySelector("#product-price");
+    const priceHelper = form.querySelector("#product-price-helper");
+
+    const descriptionTextarea = form.querySelector("#product-description");
+    const descriptionHelper = form.querySelector("#description-helper");
 
     // Валідація даних
 
-    // Формуємо дані для передачі на сервер
+    if (validateName(nameInput, nameInputHelper)
+        && validatePrice(priceInput, priceHelper)
+        && validateDescription(descriptionTextarea, descriptionHelper)
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("price", price);
-    formData.append("description", description);
-    formData.append("image", fileInput.files[0]);
-    formData.append("token", localStorage.getItem("auth-token"));
+        ) {
 
-    fetch(`/${getContext()}/shop-api`, {
-        method: 'POST',
-        body: formData
-    })
-        .then(r => r.json())
-        .then(console.log);
+        // Формуємо дані для передачі на сервер
 
+        const formData = new FormData();
+        formData.append("name", nameInput.value.trim());
+        formData.append("price", Number(priceInput.value.trim()));
+        formData.append("description", descriptionTextarea.value.trim());
+        formData.append("image", fileInput.files[0]);
+        formData.append("token", localStorage.getItem("auth-token"));
+
+        fetch(`/${getContext()}/shop-api`, {
+            method: 'POST',
+            body: formData
+        })
+            .then(r => r.json())
+            .then(j => {
+                const addProductResult = document.getElementById("add-product-result");
+                if(addProductResult) {
+                    addProductResult.innerHTML = j.meta.message;
+                    if(j.meta.status === "success") {
+
+                        addProductResult.style.background = "lightgreen";
+                    }
+                    else {
+                        addProductResult.style.background = "lightpink";
+                    }
+                }
+            });
+    }
 }
 
 function validateName (nameInput, nameInputHelper) {
@@ -289,20 +314,57 @@ function validateName (nameInput, nameInputHelper) {
         nameInputHelper.setAttribute('data-error', "Name can't be empty");
         check = false;
     }
-    else if (/\d/.test(nameInput.value)) {
-        nameInput.className = "invalid";
-        nameInputHelper.setAttribute('data-error', "Name can't contain digits");
-        check = false;
-
-    }
-    else if (/[^a-zа-яіЇє'ґ ]/i.test(nameInput.value)) {
-        nameInput.className = "invalid";
-        nameInputHelper.setAttribute('data-error', "Name can't contain special characters");
-        check = false;
-    }
     else {
         nameInput.className = "valid";
         nameInputHelper.setAttribute('data-success',"Accepted!")
+    }
+
+    return check;
+}
+
+function validatePrice (priceInput, priceHelper) {
+    var check = true;
+
+    if (priceInput.value.trim() === "")
+    {
+        priceInput.className = "invalid";
+        priceHelper.setAttribute('data-error', "Price can't be empty");
+        check = false;
+    }
+    else if (Number(priceInput.value.trim()) <= 0) {
+        priceInput.className = "invalid";
+        priceHelper.setAttribute('data-error', "Price should be positive");
+        check = false;
+    }
+    else {
+        priceInput.className = "valid";
+        priceHelper.setAttribute('data-success',"Accepted!")
+    }
+
+    return check;
+}
+
+function validateDescription (descriptionTextarea, descriptionHelper) {
+    var check = true;
+
+    if (descriptionTextarea.value === "")
+    {
+        descriptionTextarea.className = "invalid";
+        descriptionHelper.innerHTML = "Description can't be empty";
+        descriptionHelper.style.color = "red";
+        check = false;
+    }
+    else if (descriptionTextarea.value.length <= 50) {
+        descriptionTextarea.className = "invalid";
+        descriptionHelper.innerHTML = "Description should contain more than 50 chars";
+        descriptionHelper.style.color = "red";
+        check = false;
+
+    }
+    else {
+        descriptionTextarea.className = "valid";
+        descriptionHelper.innerHTML = "Accepted!";
+        descriptionHelper.style.color = "green";
     }
 
     return check;
@@ -373,3 +435,4 @@ function validateRepeatPassword (dataInput, dataInputHelper, passwordInput) {
 
     return check;
 }
+

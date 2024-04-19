@@ -12,3 +12,8 @@ main {
     border-radius: 50%;
     margin: 7px;
 }
+
+.btn-floating.halfway-fab {
+    bottom: 5px;
+    right: 5px;
+}

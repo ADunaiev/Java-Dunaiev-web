@@ -1,5 +1,7 @@
 package step.learning.dal.dto;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public class CartItem {
@@ -14,6 +16,14 @@ public class CartItem {
         this.id = id;
         this.productId = productId;
         this.count = count;
+    }
+
+    public CartItem(ResultSet resultSet) throws SQLException {
+        this (
+                UUID.fromString(resultSet.getString("cart_dt_id")),
+                UUID.fromString(resultSet.getString("product_id")),
+                resultSet.getInt("cart_dt_cnt")
+        );
     }
 
     public UUID getProductId() {

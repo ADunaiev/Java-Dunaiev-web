@@ -22,7 +22,7 @@
 </head>
 <body>
     <header>
-        <nav class="container amber lighten-1">
+        <nav class=" amber lighten-1">
             <div class="nav-wrapper">
                 <a href="<%=context%>/" class="brand-logo">My First Java web</a>
                 <ul id="nav-mobile" class="right hide-on-med-and-down">
@@ -35,11 +35,11 @@
             </div>
         </nav>
     </header>
-    <main class="container">
+    <main class="<%= request.getAttribute("skip-container") == null ? "container" : ""%>%>">
         <jsp:include page="<%= bodyFile %>" />
     </main>
 
-    <footer class="page-footer amber lighten-1 container">
+    <footer class="page-footer amber lighten-1">
         <div class="container">
             <div class="row">
                 <div class="col l6 s12">

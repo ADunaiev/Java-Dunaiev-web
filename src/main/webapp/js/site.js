@@ -23,8 +23,23 @@ document.addEventListener('DOMContentLoaded', function() {
         addProductButton.onclick = addProductButtonClick;
     }
     checkAuth();
+
 });
 
+function serveCartButtons() {
+
+    const userId = document.querySelector('[data-user-id]').getAttribute('data-user-id');
+    for( let btn of document.querySelectorAll('[data-product]')) {
+        btn.onclick = () => {
+            let productId = btn.getAttribute('data-product');
+            fetch(`/${getContext()}/shop-api?user-id=${userId}&product-id=${productId}`, {
+                method: 'PUT'
+            }).then(r => r.json()).then(j => {
+                window.location.reload();
+            });
+        }
+    }
+}
 function addProductButtonClick(e) {
     //console.log("product button clicked");
 
@@ -235,7 +250,7 @@ function checkAuth() {
             .then(j => {
                 if (j.meta.status == "success") {
                     // замінити "кнопку входу" на аватарку користувача
-                    document.querySelector('[data-auth="avatar"]').innerHTML = `<img title="${j.data.name}" class="nav-avatar" src="/${getContext()}/img/avatar/${j.data.avatar}" />`;
+                    document.querySelector('[data-auth="avatar"]').innerHTML = `<img data-user-id="${j.data.id}" title="${j.data.name}" class="nav-avatar" src="/${getContext()}/img/avatar/${j.data.avatar}" />`;
                     const product = document.querySelector('[data-auth="product"]');
                     if (product) {
                         fetch(`/${getContext()}/product.jsp`)
@@ -247,6 +262,7 @@ function checkAuth() {
                             });
 
                     }
+                    serveCartButtons();
                 }
             });
     }

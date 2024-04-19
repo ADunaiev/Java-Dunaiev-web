@@ -7,6 +7,8 @@ import step.learning.dal.dto.User;
 import step.learning.services.db.DbService;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Singleton
@@ -18,6 +20,24 @@ public class ProductDao {
     @Inject
     public ProductDao(DbService dbService) {
         this.dbService = dbService;
+    }
+
+    public List<Product> getList(int skip, int take) {
+        // skip, take - сснова пагінації - поділу на сторінки
+        List<Product> result = new ArrayList<>();
+        String sql = String.format("SELECT * FROM Products LIMIT %d, %d", skip, take);
+
+        try(Statement statement = dbService.getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            while(resultSet.next()) {
+                result.add(new Product(resultSet) );
+            }
+        }
+        catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            System.out.println(sql);
+        }
+        return result;
     }
 
     public boolean add( Product product ) {
@@ -41,5 +61,25 @@ public class ProductDao {
             System.out.println( sql );
             return false ;
         }
+    }
+
+    public Product getProductById(String productId) {
+        Product product = new Product();
+
+        String sql = String.format("SELECT * FROM products WHERE product_id = '%s'", productId);
+
+        try(Statement statement = dbService.getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            if (resultSet.next()) {
+                product = new Product(resultSet);
+            }
+        }
+        catch (SQLException ex) {
+            System.err.println(ex.getMessage());
+            System.out.println(sql);
+        }
+
+        return product;
     }
 }
